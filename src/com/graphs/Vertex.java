@@ -13,12 +13,21 @@ public class Vertex {
 
     private List<Vertex> neighbors;
     private long id;
+    private long partitionId;
     private AtomicBoolean isActive = new AtomicBoolean(true);
     private final LinkedBlockingQueue<Message> messages = new LinkedBlockingQueue<>();
 
     public Vertex(List<Vertex> neighbors, long id) {
         this.neighbors = neighbors;
         this.id = id;
+    }
+
+    public void setPartitionId(long partitionId) {
+        this.partitionId = partitionId;
+    }
+
+    public long getPartitionId() {
+        return this.partitionId;
     }
 
     public long getId() {
@@ -50,6 +59,8 @@ public class Vertex {
             if (isActive.get() && neighbors.stream().filter(Vertex::isActive).count() <= (2+eps*a)) {
                 setInactive();
                 sets.get(i).add(this);
+                setPartitionId(i);
+
                 int finalI = i;
                 neighbors.forEach(it -> {
                     Message m1 = new Message("inactive", this.id);
