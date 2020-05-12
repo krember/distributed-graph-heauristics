@@ -1,6 +1,6 @@
 package com.graphs;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public class Vertex {
 
     private List<Vertex> neighbors;
+    private Set<Edge> outgoingEdges = new TreeSet<Edge>(Comparator.comparing(it -> it.getPointsTo().getId()));
     private long id;
     private long partitionId;
     private AtomicBoolean isActive = new AtomicBoolean(true);
@@ -20,6 +21,10 @@ public class Vertex {
     public Vertex(List<Vertex> neighbors, long id) {
         this.neighbors = neighbors;
         this.id = id;
+    }
+
+    public void addOutgoingEdge(Edge e) {
+        this.outgoingEdges.add(e);
     }
 
     public void setPartitionId(long partitionId) {
