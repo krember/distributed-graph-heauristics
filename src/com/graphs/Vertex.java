@@ -16,8 +16,9 @@ public class Vertex {
     private AtomicBoolean isActive = new AtomicBoolean(true);
     private final LinkedBlockingQueue<Message> messages = new LinkedBlockingQueue<>();
 
-    public Vertex() {
-
+    public Vertex(List<Vertex> neighbors, long id) {
+        this.neighbors = neighbors;
+        this.id = id;
     }
 
     public long getId() {
@@ -41,6 +42,9 @@ public class Vertex {
     }
 
     public void task(int numRound, double eps, double a, List<List<Vertex>> sets) {
+        new Thread(() -> {
+            new Reader(neighbors, messages);
+        }).start();
 
         for (int i=0; i<numRound; i++) {
             if (isActive.get() && neighbors.stream().filter(it -> it.isActive()).collect(Collectors.toList()).size() <= (2+eps*a)) {
