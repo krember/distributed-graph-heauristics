@@ -47,7 +47,7 @@ public class Vertex {
         }).start();
 
         for (int i=0; i<numRound; i++) {
-            if (isActive.get() && neighbors.stream().filter(it -> it.isActive()).collect(Collectors.toList()).size() <= (2+eps*a)) {
+            if (isActive.get() && neighbors.stream().filter(Vertex::isActive).count() <= (2+eps*a)) {
                 setInactive();
                 sets.get(i).add(this);
                 int finalI = i;
