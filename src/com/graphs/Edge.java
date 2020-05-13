@@ -1,17 +1,15 @@
 package com.graphs;
 
 public class Edge {
-    private Vertex first;
-    private Vertex second;
-    private Vertex pointsFrom;
-    private Vertex pointsTo;
+    private Vertex source;
+    private Vertex destination;
     private long label;
 
     public Edge() {}
 
-    public Edge(Vertex first, Vertex second) {
-        this.first = first;
-        this.second= second;
+    public Edge(Vertex source, Vertex destination) {
+        this.source = source;
+        this.destination = destination;
     }
 
     public long getLabel() {
@@ -22,35 +20,19 @@ public class Edge {
         this.label = label;
     }
 
-    public Vertex getFirst() {
-        return first;
+    public Vertex getSource() {
+        return source;
     }
 
-    public void setFirst(Vertex first) {
-        this.first = first;
+    public void setSource(Vertex source) {
+        this.source = source;
     }
 
-    public Vertex getSecond() {
-        return second;
+    public Vertex getDestination() {
+        return destination;
     }
 
-    public void setSecond(Vertex second) {
-        this.second = second;
-    }
-
-    public Vertex getPointsFrom() {
-        return pointsFrom;
-    }
-
-    public void setPointsFrom(Vertex pointsFrom) {
-        this.pointsFrom = pointsFrom;
-    }
-
-    public Vertex getPointsTo() {
-        return pointsTo;
-    }
-
-    public void setPointsTo(Vertex pointsTo) {
-        this.pointsTo = pointsTo;
+    public void setDestination(Vertex destination) {
+        this.destination = destination;
     }
 }

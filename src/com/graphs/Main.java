@@ -1,47 +1,55 @@
 package com.graphs;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Main {
 
-    public static void main(String[] args) {
-	// write your code here
+    public static void main(String[] args) throws InterruptedException {
+        // write your code here
         //these are the H sets
-       int l = 3;
-       List<CopyOnWriteArrayList<Vertex>> sets = new ArrayList<>();
-       for (int i=0; i<l; i++) {
-           sets.add(new CopyOnWriteArrayList<>());
-       }
+        int l = 3;
+        List<CopyOnWriteArrayList<Vertex>> sets = new ArrayList<>();
+        for (int i = 0; i < l; i++) {
+            sets.add(new CopyOnWriteArrayList<>());
+        }
 
+        simulationRandom(50, 110);
     }
 
-    public static void orientation(List<Edge> edges) {
-        edges.forEach(it -> {
-            long firstPartitionId = it.getFirst().getPartitionId();
-            long secondPartitionId = it.getSecond().getPartitionId();
-            if (firstPartitionId < secondPartitionId) {
-                it.setPointsFrom(it.getFirst());
-                it.setPointsTo(it.getSecond());
-                it.getFirst().addOutgoingEdge(it);
-            } else if (secondPartitionId < firstPartitionId) {
-                it.setPointsFrom(it.getSecond());
-                it.setPointsTo(it.getFirst());
-                it.getSecond().addOutgoingEdge(it);
-            } else {
-                if (it.getFirst().getId() < it.getSecond().getId()) {
-                    it.setPointsFrom(it.getFirst());
-                    it.setPointsTo(it.getSecond());
-                    it.getFirst().addOutgoingEdge(it);
-                } else {
-                    it.setPointsFrom(it.getSecond());
-                    it.setPointsTo(it.getFirst());
-                    it.getSecond().addOutgoingEdge(it);
-                }
+
+    private static void simulationRandom(int numberOfVertices, int estimatedNumberOfEdges) throws InterruptedException {
+        List<Vertex> vertices = new ArrayList<>();
+        Random rand = new Random();
+
+        for(int i = 1; i <= numberOfVertices; ++i) {
+            vertices.add(new Vertex(i, 1, 20));
+        }
+
+        for(long i = 0; i < estimatedNumberOfEdges; ++i) {
+            int source = Math.abs(rand.nextInt() % numberOfVertices);
+            int target = Math.abs(rand.nextInt() % numberOfVertices);
+
+            if(source != target) {
+                vertices.get(source).addNeighbor(vertices.get(target));
+                vertices.get(target).addNeighbor(vertices.get(source));
             }
-        });
+        }
+
+        List<Thread> threads = new ArrayList<>();
+        for(Vertex v : vertices) {
+            Thread thread = new Thread(v);
+            threads.add(thread);
+            thread.start();
+        }
+
+        for(Thread t : threads) {
+            t.join();
+        }
     }
+
 
 //    /**
 //     *
