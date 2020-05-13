@@ -22,7 +22,6 @@ public class Reader {
             try {
                 Message msg = this.messages.take();  //blocks until message is available
 //                logger.info("Message sent -> Content: " + msg.getContent() + ", Source: " + msg.getSenderId());
-                System.out.println("Message sent -> Content: " + msg.getContent() + ", Source: " + msg.getSenderId());
                 if ("inactive".equals(msg.getContent())) {
                     this.neighbors.stream().filter(it -> it.getId() == msg.getSenderId()).collect(Collectors.toList()).get(0).setInactive();
                 }

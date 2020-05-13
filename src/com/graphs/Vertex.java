@@ -1,17 +1,21 @@
 package com.graphs;
 
-import javax.print.attribute.standard.RequestingUserName;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 
 /**
- * Note that in local case there is no need to mark a neighbor inactive. It's necessary however in case different machines are used
+ * Note that in local case there is no need to mark arboricity neighbor inactive. It's necessary however in case different machines are used
  */
 public class Vertex implements Runnable {
+    public static AtomicInteger numberOfEdgesYetToBeLabelled = new AtomicInteger();
+    public static AtomicInteger numberOfVerticesYetActive = new AtomicInteger();
+
+    public static final AtomicInteger numberOfForests = new AtomicInteger();
+
     private static final Logger logger = Logger.getLogger(Thread.currentThread().getName());
 
     private Set<Vertex> neighbors = new HashSet<>();
@@ -22,12 +26,17 @@ public class Vertex implements Runnable {
     private final LinkedBlockingQueue<Message> messages = new LinkedBlockingQueue<>();
 
     private double eps;
-    private double a;
+    private double arboricity;
+    private int numRounds;
 
-    public Vertex(long id, double eps, long a) {
+    public Vertex(long id) {
         this.id = id;
+    }
+
+    public void init(double eps, long arboricity, long n) {
         this.eps = eps;
-        this.a = a;
+        this.arboricity = arboricity;
+        this.numRounds = (int) Math.floor(Math.log(n) * 2 / eps);
     }
 
     public void sendMessage(Message msg) {
@@ -43,22 +52,28 @@ public class Vertex implements Runnable {
             new Reader(neighbors, messages);
         }).start();
 
-        int numRound = 19;
-        hPartition(numRound, eps, a);
+        hPartition(eps, arboricity);
 
-        if (neighbors.stream().noneMatch(Vertex::isActive)) {
-            orientation();
-            labelOutgoingEdges();
+        Thread.sleep(5000);
+        while (neighbors.stream().anyMatch(Vertex::isActive)) {
+            Thread.sleep(1000);
         }
+        orientation();
+
+        Thread.sleep(5000);
+        labelOutgoingEdges();
     }
 
-    private void hPartition(int numRound, double eps, double a) throws InterruptedException {
-        for (int i = 0; i < numRound; i++) {
+    private void hPartition(double eps, double a) throws InterruptedException {
+        for (int i = 0; i < numRounds; i++) {
             if (isActive.get() && neighbors.stream().filter(Vertex::isActive).count() <= (2 + eps) * a) {
+                System.out.println("Number of vertices yet active: " + numberOfVerticesYetActive.decrementAndGet());
                 setInactive();
                 setHPartitionId(i);
 
                 int finalI = i;
+                System.out.println("Message broadcasted -> Content: \"joined to H" + finalI + "\" , Source: " + id);
+//                System.out.println("Message sent -> Content: \"inactive\" , Source: " + id);
                 neighbors.forEach(it -> {
                     Message m1 = new Message("inactive", this.id);
                     Message m2 = new Message(this.id + " joined to H" + finalI, this.id);
@@ -66,8 +81,7 @@ public class Vertex implements Runnable {
                     it.sendMessage(m2);
                 });
             }
-            Thread.sleep(1000); //TODO
-            // for the second if the reader has already marked
+            Thread.sleep(5);
         }
     }
 
@@ -76,8 +90,16 @@ public class Vertex implements Runnable {
 
         for (Edge e : outgoingEdges) {
 //            logger.info("Edge (" + e.getSource().getId() + ", " + e.getDestination().getId() + ") have been assigned label: " + count);
+
             System.out.println("Edge (" + e.getSource().getId() + ", " + e.getDestination().getId() + ") has been added to the forest: " + count);
             e.setLabel(count++);
+            System.out.println("Number of edges yet to be labelled: " + numberOfEdgesYetToBeLabelled.decrementAndGet());
+        }
+
+        synchronized (numberOfForests) {
+            if(numberOfForests.get() < count) {
+                numberOfForests.set(count);
+            }
         }
     }
 
@@ -95,7 +117,7 @@ public class Vertex implements Runnable {
                 this.addOutgoingEdge(edge);
 //                logger.info("Edge (" + edge.getSource().getId() + ", " + edge.getDestination().getId() + ") has been oriented!");
                 System.out.println("Edge (" + edge.getSource().getId() + ", " + edge.getDestination().getId() + ") has been oriented!");
-            } else if (firstId < secondId) {
+            } else if (firstPartitionId == secondPartitionId && firstId < secondId) {
                 edge = new Edge(this, neighbor);
                 this.addOutgoingEdge(edge);
 //                logger.info("Edge (" + edge.getSource().getId() + ", " + edge.getDestination().getId() + ") has been oriented!");
@@ -113,6 +135,11 @@ public class Vertex implements Runnable {
 
     public void addNeighbors(List<Vertex> vertices) {
         neighbors.addAll(vertices);
+    }
+
+    // Utility: not used in the algorithm
+    public int degree() {
+        return neighbors.size();
     }
 
     public void addOutgoingEdge(Edge e) {
