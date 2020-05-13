@@ -24,16 +24,20 @@ public class Main {
             if (firstPartitionId < secondPartitionId) {
                 it.setPointsFrom(it.getFirst());
                 it.setPointsTo(it.getSecond());
+                it.getFirst().addOutgoingEdge(it);
             } else if (secondPartitionId < firstPartitionId) {
                 it.setPointsFrom(it.getSecond());
                 it.setPointsTo(it.getFirst());
+                it.getSecond().addOutgoingEdge(it);
             } else {
                 if (it.getFirst().getId() < it.getSecond().getId()) {
                     it.setPointsFrom(it.getFirst());
                     it.setPointsTo(it.getSecond());
+                    it.getFirst().addOutgoingEdge(it);
                 } else {
                     it.setPointsFrom(it.getSecond());
                     it.setPointsTo(it.getFirst());
+                    it.getSecond().addOutgoingEdge(it);
                 }
             }
         });

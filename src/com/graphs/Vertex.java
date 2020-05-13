@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class Vertex {
 
     private List<Vertex> neighbors;
-    private Set<Edge> outgoingEdges = new TreeSet<Edge>(Comparator.comparing(it -> it.getPointsTo().getId()));
+    private Set<Edge> outgoingEdges = new TreeSet<>(Comparator.comparing(it -> it.getPointsTo().getId()));
     private long id;
     private long partitionId;
     private AtomicBoolean isActive = new AtomicBoolean(true);
@@ -75,6 +75,14 @@ public class Vertex {
                 });
             }
             // for the second if the reader has already marked
+        }
+    }
+
+    public void labelOutgoingEdges() {
+        int count = this.outgoingEdges.size();
+
+        for (Edge e : outgoingEdges) {
+            e.setLabel(count++);
         }
     }
 

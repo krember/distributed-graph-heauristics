@@ -5,12 +5,21 @@ public class Edge {
     private Vertex second;
     private Vertex pointsFrom;
     private Vertex pointsTo;
+    private long label;
 
     public Edge() {}
 
     public Edge(Vertex first, Vertex second) {
         this.first = first;
         this.second= second;
+    }
+
+    public long getLabel() {
+        return label;
+    }
+
+    public void setLabel(long label) {
+        this.label = label;
     }
 
     public Vertex getFirst() {
