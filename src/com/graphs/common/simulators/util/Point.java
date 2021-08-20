@@ -1,4 +1,4 @@
-package com.graphs.simulators.util;
+package com.graphs.common.simulators.util;
 
 public class Point {
     private double x;

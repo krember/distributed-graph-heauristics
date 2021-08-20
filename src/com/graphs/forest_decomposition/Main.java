@@ -1,6 +1,7 @@
-package com.graphs;
+package com.graphs.forest_decomposition;
 
-import com.graphs.simulators.*;
+import com.graphs.common.simulators.Simulator;
+import com.graphs.forest_decomposition.simulators.*;
 
 import java.util.ArrayList;
 import java.util.List;

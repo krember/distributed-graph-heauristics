@@ -1,11 +1,10 @@
-package com.graphs;
+package com.graphs.forest_decomposition;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
-
 
 /**
  * Note that in local case there is no need to mark arboricity neighbor inactive. It's necessary however in case different machines are used

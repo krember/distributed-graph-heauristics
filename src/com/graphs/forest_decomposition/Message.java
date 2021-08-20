@@ -1,4 +1,4 @@
-package com.graphs;
+package com.graphs.forest_decomposition;
 
 public class Message {
 

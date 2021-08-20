@@ -1,8 +1,6 @@
-package com.graphs;
+package com.graphs.forest_decomposition;
 
-import java.util.AbstractQueue;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
